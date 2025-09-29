@@ -65,7 +65,7 @@ function AddItemForm() {
     data.append("category", formData.category);
     data.append("phone_number", formData.phone);
 
-    fetch("http://localhost:3003/api/products", {
+    fetch("https://development-gttd.onrender.com/api/products", {
       method: "POST",
       body: data,
     })

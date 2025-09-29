@@ -18,7 +18,7 @@ export default function TrackOrder() {
       }
 
       try {
-        const res = await fetch(`http://localhost:3003/api/orders/customer/${customerId}`);
+        const res = await fetch(`https://development-gttd.onrender.com/api/orders/customer/${customerId}`);
         if (!res.ok) throw new Error("Failed to fetch orders");
         const data = await res.json();
         setOrders(data.orders || []);

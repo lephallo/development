@@ -11,7 +11,7 @@ function Notification() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch("http://localhost:3003/api/orders");
+        const res = await fetch("https://development-gttd.onrender.com/api/orders");
         const data = await res.json();
         setOrders(data.orders || []);
       } catch (err) {
@@ -26,7 +26,7 @@ function Notification() {
 
   const handleApprove = async (orderId) => {
     try {
-      const res = await fetch(`http://localhost:3003/api/orders/${orderId}`, {
+      const res = await fetch(`https://development-gttd.onrender.com/api/orders/${orderId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "Approved" }),

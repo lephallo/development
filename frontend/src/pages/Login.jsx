@@ -13,7 +13,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:3003/api/login", { email, password });
+      const res = await axios.post("https://development-gttd.onrender.com/api/login", { email, password });
 
       // ✅ Save the logged-in user to localStorage
       localStorage.setItem("user", JSON.stringify(res.data.user));

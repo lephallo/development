@@ -32,7 +32,7 @@ export default function Order() {
     }
 
     try {
-      const res = await axios.post("http://localhost:3003/api/orders", {
+      const res = await axios.post("https://development-gttd.onrender.com/api/orders", {
         productId: product.id,
         customerId,
         quantity,

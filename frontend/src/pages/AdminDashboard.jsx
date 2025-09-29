@@ -12,7 +12,7 @@ export default function AdminDashboard() {
   // ---------------- FETCH PRODUCTS ----------------
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:3003/api/products");
+      const res = await fetch("https://development-gttd.onrender.com/api/products");
       const data = await res.json();
       setProducts(data.products || []);
     } catch (err) {
@@ -23,7 +23,7 @@ export default function AdminDashboard() {
   // ---------------- FETCH VENDORS ----------------
   const fetchVendors = async () => {
     try {
-      const res = await fetch("http://localhost:3003/api/vendors");
+      const res = await fetch("https://development-gttd.onrender.com/api/vendors");
       const data = await res.json();
       setVendors(data.vendors || []);
       setShowVendors(true);
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
   // ---------------- FETCH CUSTOMERS ----------------
   const fetchCustomers = async () => {
     try {
-      const res = await fetch("http://localhost:3003/api/customers");
+      const res = await fetch("https://development-gttd.onrender.com/api/customers");
       const data = await res.json();
       setCustomers(data.customers || []);
       setShowCustomers(true);
@@ -50,7 +50,7 @@ export default function AdminDashboard() {
   const handleDeleteProduct = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
-      const res = await fetch(`http://localhost:3003/api/products/${id}`, {
+      const res = await fetch(`https://development-gttd.onrender.com/api/products/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete product");
@@ -177,7 +177,7 @@ export default function AdminDashboard() {
                       <td style={cellStyle}>
                         {p.photo ? (
                           <img
-                            src={`http://localhost:3003/uploads/${p.photo}`}
+                            src={`https://development-gttd.onrender.com/uploads/${p.photo}`}
                             alt={p.name}
                             style={{ width: "50px", height: "50px", objectFit: "cover" }}
                           />

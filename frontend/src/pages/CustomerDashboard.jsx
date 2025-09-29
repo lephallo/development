@@ -13,7 +13,7 @@ export default function CustomerDashboard() {
   // ----------------- Fetch Vendors -----------------
   const fetchVendors = async () => {
     try {
-      const res = await fetch("http://localhost:3003/api/vendors");
+      const res = await fetch("https://development-gttd.onrender.com/api/vendors");
       if (!res.ok) throw new Error("Failed to fetch vendors");
       const data = await res.json();
       setVendors(data.vendors || []);
@@ -27,7 +27,7 @@ export default function CustomerDashboard() {
   // ----------------- Fetch Products -----------------
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:3003/api/products");
+      const res = await fetch("https://development-gttd.onrender.com/api/products");
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       setProducts(data.products || []);
@@ -148,7 +148,7 @@ export default function CustomerDashboard() {
             <div key={product.id} style={productCardStyle}>
               {product.photo && (
                 <img
-                  src={`http://localhost:3003/uploads/${product.photo}`}
+                  src={`https://development-gttd.onrender.com/uploads/${product.photo}`}
                   alt={product.name}
                   style={productImageStyle}
                 />

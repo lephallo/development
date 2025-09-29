@@ -16,7 +16,7 @@ export default function Register() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:3003/api/register", {
+      const res = await axios.post("https://development-gttd.onrender.com/api/register", {
         name,
         surname,
         role,
