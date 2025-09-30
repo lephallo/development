@@ -13,19 +13,6 @@ app.use('/uploads', express.static('uploads'));
 
 
 // --------------------- CORS ---------------------
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost")) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS"],
-    credentials: true,
-  })
-);
 
 // --------------------- Body parser ---------------------
 app.use(express.json());
@@ -38,6 +25,39 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
+
+
+
+const allowedOrigins = [
+  "http://localhost:5173",                 // Vite dev server
+  "https://development-1-3bvs.onrender.com" // Deployed frontend
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like Postman or curl)
+      if (!origin) return callback(null, true);
+
+      // Allow only listed origins
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.warn(`Blocked CORS request from: ${origin}`);
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    credentials: true, // required if your frontend uses cookies or auth headers
+  })
+);
+
+// Handle preflight requests (OPTIONS)
+app.options("*", cors());
+
+
+
+
 
 // Test DB connection on startup
 (async () => {
