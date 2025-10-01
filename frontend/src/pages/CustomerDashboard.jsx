@@ -17,7 +17,7 @@ export default function CustomerDashboard() {
       if (!res.ok) throw new Error("Failed to fetch vendors");
       const data = await res.json();
       setVendors(data.vendors || []);
-      setShowVendors(true);
+      setShowVendors((prev) => !prev); // toggle dropdown
     } catch (err) {
       console.error("Error fetching vendors:", err);
       alert("Failed to load vendors. Check backend server.");
@@ -50,6 +50,7 @@ export default function CustomerDashboard() {
     } else {
       setFilteredProducts(products);
     }
+    setShowVendors(false); // hide after selection
   };
 
   const handleLogout = () => {
@@ -63,87 +64,66 @@ export default function CustomerDashboard() {
         backgroundColor: "#f8f9fa",
         minHeight: "100vh",
         display: "flex",
-        overflowX: "hidden",
+        flexDirection: "column",
       }}
     >
-      {/* Sidebar */}
-      <div
-        style={{
-          width: "300px",
-          backgroundColor: "#D8BFD8",
-          padding: "2rem 1rem",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          minHeight: "100vh",
-          borderTopRightRadius: "50px",
-          borderBottomRightRadius: "50px",
-          boxShadow: "2px 0 10px rgba(0,0,0,0.2)",
-        }}
-      >
-        {/* Top buttons */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {/* View Vendors Button */}
-          <button onClick={fetchVendors} style={buttonStyle}>
-            View list of street vendors
+      {/* Navbar */}
+      <div style={navbarStyle}>
+        <h2 style={{ color: "white", margin: 0 }}>Customer Dashboard</h2>
+        <div>
+          <button onClick={fetchVendors} style={topBtnStyle}>
+            View Vendors
           </button>
-
-          {/* Track Order Button */}
-          <button onClick={() => navigate("/trackorder")} style={buttonStyle}>
-            Track My Orders
+          <button onClick={() => navigate("/trackorder")} style={topBtnStyle}>
+            Track Orders
+          </button>
+          <button onClick={handleLogout} style={{ ...topBtnStyle, backgroundColor: "#dc3545" }}>
+            Logout
           </button>
         </div>
+      </div>
 
-        {/* Vendor list */}
-        {showVendors && (
-          <ul style={vendorListStyle}>
-            {vendors.length === 0 ? (
-              <li style={{ padding: "0.5rem", color: "#555" }}>No vendors found</li>
-            ) : (
-              <>
-                {vendors.map((vendor) => (
-                  <li
-                    key={vendor.id}
-                    onClick={() => handleVendorClick(vendor.id)}
-                    style={{
-                      ...vendorItemStyle,
-                      backgroundColor: selectedVendorId === vendor.id ? "#e0f7fa" : "transparent",
-                    }}
-                  >
-                    {vendor.name}
-                  </li>
-                ))}
+      {/* Vendor Dropdown */}
+      {showVendors && (
+        <ul style={vendorDropdownStyle}>
+          {vendors.length === 0 ? (
+            <li style={{ padding: "0.5rem", color: "#555" }}>No vendors found</li>
+          ) : (
+            <>
+              {vendors.map((vendor) => (
                 <li
-                  onClick={() => handleVendorClick(null)}
+                  key={vendor.id}
+                  onClick={() => handleVendorClick(vendor.id)}
                   style={{
-                    padding: "0.75rem",
-                    cursor: "pointer",
-                    color: "#007bff",
-                    textAlign: "center",
+                    ...vendorDropdownItem,
+                    backgroundColor: selectedVendorId === vendor.id ? "#f0e6ff" : "white",
                   }}
                 >
-                  Show All
+                  {vendor.name}
                 </li>
-              </>
-            )}
-          </ul>
-        )}
-
-        {/* Spacer */}
-        <div style={{ flexGrow: 1 }} />
-
-        {/* Logout button */}
-        <button onClick={handleLogout} style={logoutBtnStyle}>
-          Logout
-        </button>
-      </div>
+              ))}
+              <li
+                onClick={() => handleVendorClick(null)}
+                style={{ ...vendorDropdownItem, fontWeight: "bold", color: "#6f42c1" }}
+              >
+                Show All
+              </li>
+            </>
+          )}
+        </ul>
+      )}
 
       {/* Main content */}
       <div style={{ flex: 1, padding: "2rem", overflowY: "auto" }}>
-        <h1 style={mainHeadingStyle}>Customer Dashboard</h1>
-
         {/* Products Grid */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1.5rem",
+            justifyContent: "center",
+          }}
+        >
           {filteredProducts.map((product) => (
             <div key={product.id} style={productCardStyle}>
               {product.photo && (
@@ -176,58 +156,46 @@ export default function CustomerDashboard() {
   );
 }
 
-// ------------------- Styles -------------------
-const buttonStyle = {
-  backgroundColor: "#6A0DAD",
-  color: "#fff",
-  padding: "0.75rem 1.5rem",
-  border: "none",
-  borderRadius: "25px",
-  cursor: "pointer",
-  fontSize: "1rem",
-  fontWeight: "bold",
+// ----------------- Styles -----------------
+const navbarStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "1rem 2rem",
+  backgroundColor: "#6f42c1",
+  borderBottomLeftRadius: "20px",
+  borderBottomRightRadius: "20px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
 };
 
-const logoutBtnStyle = {
-  backgroundColor: "#dc3545",
+const topBtnStyle = {
+  backgroundColor: "#6f42c1",
   color: "#fff",
-  padding: "0.75rem 1.5rem",
+  padding: "0.5rem 1rem",
   border: "none",
-  borderRadius: "25px",
+  borderRadius: "4px",
   cursor: "pointer",
-  fontSize: "1rem",
-  width: "100%",
-  marginTop: "1rem",
+  fontSize: "0.9rem",
+  marginLeft: "0.5rem",
 };
 
-const vendorListStyle = {
+const vendorDropdownStyle = {
   listStyle: "none",
-  padding: 0,
-  maxHeight: "200px",
-  overflowY: "auto",
-  backgroundColor: "#fff",
-  borderRadius: "15px",
-  marginTop: "1rem",
+  margin: "0.5rem auto",
   padding: "0.5rem",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  backgroundColor: "#fff",
+  borderRadius: "8px",
+  maxWidth: "300px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
 };
 
-const vendorItemStyle = {
-  padding: "0.75rem",
+const vendorDropdownItem = {
+  padding: "0.5rem",
   borderBottom: "1px solid #eee",
   cursor: "pointer",
-  borderRadius: "8px",
-  transition: "background-color 0.3s",
 };
 
-const mainHeadingStyle = {
-  fontSize: "2rem",
-  color: "#6A0DAD",
-  fontWeight: "bold",
-  textAlign: "center",
-  marginBottom: "2rem",
-};
-
+// Reuse product card styles
 const productCardStyle = {
   backgroundColor: "#fff",
   borderRadius: "15px",
@@ -249,13 +217,13 @@ const productImageStyle = {
 const productNameStyle = {
   margin: "0 0 0.5rem",
   fontSize: "1.2rem",
-  color: "#6A0DAD",
+  color: "#6f42c1",
 };
 
 const productTextStyle = { margin: "0.25rem 0", color: "#555" };
 
 const orderBtnStyle = {
-  backgroundColor: "#6A0DAD",
+  backgroundColor: "#6f42c1",
   color: "#fff",
   padding: "0.75rem",
   border: "none",

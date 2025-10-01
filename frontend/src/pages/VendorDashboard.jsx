@@ -1,12 +1,49 @@
-import React from "react";
+import React, { memo } from "react";
 import { FaBell } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+// Memoized chart components to reduce re-renders
+const OrdersChart = memo(({ data }) => (
+  <div style={{ backgroundColor: "#fff", padding: "1rem", borderRadius: "15px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)", overflowX: "auto" }}>
+    <h3>Orders Over Time</h3>
+    <ResponsiveContainer width="100%" height={250}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Line type="monotone" dataKey="count" stroke="#dc3545" strokeWidth={3} />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+));
+
+const RevenueChart = memo(({ data }) => {
+  const BAR_COLORS = ["#6A0DAD", "#00C49F", "#dc3545"];
+  return (
+    <div style={{ backgroundColor: "#fff", padding: "1rem", borderRadius: "15px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)", overflowX: "auto" }}>
+      <h3>Revenue per Product</h3>
+      <ResponsiveContainer width="100%" height={250}>
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="product" />
+          <YAxis />
+          <Tooltip />
+          {data.map((entry, index) => (
+            <Bar key={index} dataKey="revenue" fill={BAR_COLORS[index % BAR_COLORS.length]} />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}); // <-- fixed here
 
 function VendorDashboard() {
   const navigate = useNavigate();
+  const ordersCount = 7;
 
-  // Dummy data for charts
+  // Dummy data
   const orderData = [
     { date: "2025-09-25", count: 5 },
     { date: "2025-09-26", count: 8 },
@@ -14,59 +51,41 @@ function VendorDashboard() {
     { date: "2025-09-28", count: 12 },
     { date: "2025-09-29", count: 14 },
   ];
-
   const revenueData = [
     { product: "Product A", revenue: 150 },
     { product: "Product B", revenue: 300 },
     { product: "Product C", revenue: 120 },
   ];
 
-  const ordersCount = 7; // Example notification count
-
   const logout = () => {
     localStorage.removeItem("vendorId");
     localStorage.removeItem("vendorName");
     navigate("/login");
   };
+  const handleAddProduct = () => navigate("/add-item");
 
-  const handleAddProduct = () => {
-    navigate("/add-item");
-  };
-
-  // ---------------- Styles ----------------
-  const sidebarStyle = {
-    width: "300px",
-    backgroundColor: "#D8BFD8",
+  // Styles
+  const navbarStyle = {
     display: "flex",
-    flexDirection: "column",
     justifyContent: "space-between",
-    padding: "2rem 1rem",
-    borderTopRightRadius: "50px",
-    borderBottomRightRadius: "50px",
-    minHeight: "100vh",
-    boxShadow: "2px 0 10px rgba(0,0,0,0.2)",
-    fontFamily: "'Outfit', sans-serif",
-    position: "fixed",
-    overflowY: "auto",
+    alignItems: "center",
+    padding: "1rem",
+    backgroundColor: "#6A0DAD",
+    color: "#fff",
+    flexWrap: "wrap",
   };
-
-  const topSectionStyle = {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1.5rem",
-  };
-
-  const iconContainerStyle = {
-    position: "relative",
-    display: "inline-block",
-    cursor: "pointer",
-  };
-
-  const iconStyle = {
-    fontSize: "36px",
+  const logoStyle = { fontWeight: "bold", fontSize: "1.5rem" };
+  const navButtonsStyle = { display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" };
+  const buttonStyle = {
+    backgroundColor: "#fff",
     color: "#6A0DAD",
+    padding: "0.5rem 1rem",
+    border: "none",
+    borderRadius: "25px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    transition: "0.3s ease",
   };
-
   const badgeStyle = {
     position: "absolute",
     top: "-6px",
@@ -81,116 +100,37 @@ function VendorDashboard() {
     alignItems: "center",
     fontSize: "12px",
     fontWeight: "bold",
-    zIndex: 1,
   };
-
-  const buttonStyle = {
-    backgroundColor: "#6A0DAD",
-    color: "#fff",
-    padding: "0.75rem 1.5rem",
-    border: "none",
-    borderRadius: "25px",
-    cursor: "pointer",
-    fontSize: "1rem",
-    fontWeight: "bold",
-    width: "100%",
-    textAlign: "center",
-    transition: "0.3s ease",
-  };
-
-  const logoutStyle = {
-    ...buttonStyle,
-    backgroundColor: "#dc3545",
-  };
-
-  const buttonHoverStyle = {
-    backgroundColor: "#553c9a",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-  };
-
   const mainStyle = {
-    marginLeft: "300px",
-    padding: "2rem",
+    padding: "1rem",
     minHeight: "100vh",
     backgroundColor: "#f8f9fa",
-    fontFamily: "'Outfit', sans-serif",
     display: "flex",
     flexDirection: "column",
-    gap: "2rem",
+    gap: "1rem",
+    fontFamily: "'Outfit', sans-serif",
   };
-
-  const chartBoxStyle = {
-    backgroundColor: "#fff",
-    padding: "1rem",
-    borderRadius: "15px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-  };
-
-  const BAR_COLORS = ["#6A0DAD", "#00C49F", "#dc3545"]; // Purple, Green, Red
-  const LINE_COLOR = "#dc3545"; // Red line
 
   return (
-    <div style={{ display: "flex" }}>
-      {/* Sidebar */}
-      <div style={sidebarStyle}>
-        <div style={topSectionStyle}>
-          {/* Notification Icon */}
-          <div style={iconContainerStyle} onClick={() => navigate("/notification")}>
-            <FaBell style={iconStyle} />
+    <div>
+      {/* Navbar */}
+      <nav style={navbarStyle}>
+        <div style={logoStyle}>Vendor Dashboard</div>
+        <div style={navButtonsStyle}>
+          <div style={{ position: "relative", cursor: "pointer" }} onClick={() => navigate("/notification")}>
+            <FaBell size={24} />
             {ordersCount > 0 && <span style={badgeStyle}>{ordersCount}</span>}
           </div>
-
-          {/* Add Product Button */}
-          <button
-            style={buttonStyle}
-            onClick={handleAddProduct}
-            onMouseOver={(e) => Object.assign(e.currentTarget.style, buttonHoverStyle)}
-            onMouseOut={(e) => Object.assign(e.currentTarget.style, buttonStyle)}
-          >
-            Add Product
-          </button>
+          <button style={buttonStyle} onClick={handleAddProduct}>Add Product</button>
+          <button style={{ ...buttonStyle, backgroundColor: "#dc3545", color: "#fff" }} onClick={logout}>Logout</button>
         </div>
-
-        {/* Logout Button */}
-        <button
-          style={logoutStyle}
-          onClick={logout}
-          onMouseOver={(e) => Object.assign(e.currentTarget.style, { backgroundColor: "#b52a3a" })}
-          onMouseOut={(e) => Object.assign(e.currentTarget.style, logoutStyle)}
-        >
-          Logout
-        </button>
-      </div>
+      </nav>
 
       {/* Main Content */}
       <div style={mainStyle}>
-        <h1 style={{ color: "#6A0DAD", fontWeight: "bold", textAlign: "center" }}>Welcome to Vendor Dashboard</h1>
-
-        {/* Line Chart: Orders Over Time */}
-        <div style={chartBoxStyle}>
-          <h3>Orders Over Time</h3>
-          <LineChart width={500} height={250} data={orderData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="count" stroke={LINE_COLOR} strokeWidth={3} />
-          </LineChart>
-        </div>
-
-        {/* Bar Chart: Revenue per Product */}
-        <div style={chartBoxStyle}>
-          <h3>Revenue per Product</h3>
-          <BarChart width={500} height={250} data={revenueData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="product" />
-            <YAxis />
-            <Tooltip />
-            {revenueData.map((entry, index) => (
-              <Bar key={index} dataKey="revenue" fill={BAR_COLORS[index % BAR_COLORS.length]} />
-            ))}
-          </BarChart>
-        </div>
+        <h2 style={{ color: "#6A0DAD", fontWeight: "bold", textAlign: "center" }}>Welcome to Your Dashboard</h2>
+        <OrdersChart data={orderData} />
+        <RevenueChart data={revenueData} />
       </div>
     </div>
   );

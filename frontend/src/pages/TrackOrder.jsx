@@ -1,3 +1,4 @@
+// src/pages/TrackOrder.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,13 +11,13 @@ export default function TrackOrder() {
   const customerId = user?.id;
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!customerId) {
-        alert("⚠️ You must be logged in to track orders.");
-        navigate("/"); // redirect home if not logged in
-        return;
-      }
+    if (!customerId) {
+      alert("⚠️ You must be logged in to track orders.");
+      navigate("/"); 
+      return;
+    }
 
+    const fetchOrders = async () => {
       try {
         const res = await fetch(`https://development-gttd.onrender.com/api/orders/customer/${customerId}`);
         if (!res.ok) throw new Error("Failed to fetch orders");
@@ -34,105 +35,127 @@ export default function TrackOrder() {
   }, [customerId, navigate]);
 
   return (
-    <div
-      style={{
-        maxWidth: "800px",
-        margin: "50px auto",
-        padding: "20px",
-        backgroundColor: "#fff",
-        borderRadius: "10px",
-        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-        fontFamily: "'Outfit', sans-serif",
-      }}
-    >
-      {/* Back button */}
-      <button
-        onClick={() => navigate("/customerDashboard")}
-        style={{
-          marginBottom: "20px",
-          backgroundColor: "#6f42c1",
-          color: "#fff",
-          padding: "10px 20px",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        ← Back
-      </button>
-
-      <h2 style={{ textAlign: "center", color: "#4CAF50", marginBottom: "20px" }}>
-        📦 My Orders
-      </h2>
+    <div className="track-page">
+      <button className="back-btn" onClick={() => navigate("/customerDashboard")}>←</button>
+      <h2>📦 My Orders</h2>
 
       {loading ? (
-        <p style={{ textAlign: "center" }}>Loading orders...</p>
+        <p className="center-text">Loading orders...</p>
       ) : orders.length === 0 ? (
-        <p style={{ textAlign: "center" }}>No orders found.</p>
+        <p className="center-text">No orders found.</p>
       ) : (
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            textAlign: "left",
-          }}
-        >
-          <thead>
-            <tr style={{ backgroundColor: "#f3f4f6" }}>
-              <th style={thStyle}>Order ID</th>
-              <th style={thStyle}>Product</th>
-              <th style={thStyle}>Qty</th>
-              <th style={thStyle}>Total (M)</th>
-              <th style={thStyle}>Date</th>
-              <th style={thStyle}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={tdStyle}>{order.id}</td>
-                <td style={tdStyle}>{order.product_name}</td>
-                <td style={tdStyle}>{order.quantity}</td>
-                <td style={tdStyle}>{order.total_price}</td>
-                <td style={tdStyle}>
-                  {new Date(order.created_at).toLocaleString()}
-                </td>
-                <td style={{ ...tdStyle, fontWeight: "bold", color: getStatusColor(order.status) }}>
-                  {order.status}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="orders-table">
+          <div className="table-header">
+            <span>Order ID</span>
+            <span>Product</span>
+            <span>Qty</span>
+            <span>Total (M)</span>
+            <span>Date</span>
+            <span>Status</span>
+          </div>
+          {orders.map((order) => (
+            <div key={order.id} className="table-row">
+              <span>{order.id}</span>
+              <span>{order.product_name}</span>
+              <span>{order.quantity}</span>
+              <span>{order.total_price}</span>
+              <span>{new Date(order.created_at).toLocaleString()}</span>
+              <span className={`status ${order.status?.toLowerCase()}`}>{order.status}</span>
+            </div>
+          ))}
+        </div>
       )}
+
+      <style>{`
+        .track-page {
+          max-width: 900px;
+          margin: 20px auto;
+          padding: 20px;
+          background-color: #fff;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          font-family: 'Outfit', sans-serif;
+        }
+
+        .back-btn {
+          background-color: #6b46c1;
+          color: #fff;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 18px;
+          margin-bottom: 15px;
+        }
+
+        h2 {
+          text-align: center;
+          color: #4CAF50;
+          margin-bottom: 20px;
+        }
+
+        .center-text {
+          text-align: center;
+        }
+
+        .orders-table {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          border-top: 2px solid #ddd;
+        }
+
+        .table-header, .table-row {
+          display: contents;
+        }
+
+        .table-header span {
+          font-weight: bold;
+          padding: 10px;
+          border-bottom: 2px solid #ddd;
+        }
+
+        .table-row span {
+          padding: 10px;
+          border-bottom: 1px solid #eee;
+          font-size: 14px;
+          color: #555;
+        }
+
+        .status.pending { color: #ff9800; font-weight: bold; }
+        .status.confirmed { color: #2196f3; font-weight: bold; }
+        .status.delivered { color: #4caf50; font-weight: bold; }
+        .status.cancelled { color: #f44336; font-weight: bold; }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+          .orders-table {
+            display: flex;
+            flex-direction: column;
+          }
+
+          .table-header {
+            display: none;
+          }
+
+          .table-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+          }
+
+          .table-row span {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border: none;
+          }
+
+          .table-row span:first-child { font-weight: bold; }
+        }
+      `}</style>
     </div>
   );
-}
-
-const thStyle = {
-  padding: "12px",
-  fontSize: "14px",
-  color: "#333",
-  borderBottom: "2px solid #ddd",
-};
-
-const tdStyle = {
-  padding: "10px",
-  fontSize: "14px",
-  color: "#555",
-};
-
-function getStatusColor(status) {
-  switch (status?.toLowerCase()) {
-    case "pending":
-      return "#ff9800";
-    case "confirmed":
-      return "#2196f3";
-    case "delivered":
-      return "#4caf50";
-    case "cancelled":
-      return "#f44336";
-    default:
-      return "#555";
-  }
 }

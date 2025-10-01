@@ -16,14 +16,13 @@ export default function Register() {
     setError("");
 
     try {
-      const res = await axios.post("https://development-gttd.onrender.com/api/register", {
+      await axios.post("https://development-gttd.onrender.com/api/register", {
         name,
         surname,
         role,
         email,
         password,
       });
-      console.log("User registered:", res.data);
       navigate("/login");
     } catch (err) {
       console.error(err);
@@ -32,36 +31,61 @@ export default function Register() {
   };
 
   return (
-    <div>
-      {/* Internal CSS */}
+    <div className="register-page">
       <style>{`
-        body, html, #root {
-          height: 100%;
-          margin: 0;
-          font-family: Arial, sans-serif;
-          background-color: #ffffff;
-        }
-        .container {
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html, #root { height: 100%; font-family: Arial, sans-serif; }
+
+        .register-page {
           display: flex;
           justify-content: center;
           align-items: center;
-          height: 100vh;
+          min-height: 100vh;
           padding: 10px;
+          background-color: #ffffff;
         }
+
         .register-form {
-          background-color: white;
-          padding: 40px;
-          border-radius: 20px;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+          position: relative;
+          background: #fff;
+          padding: 30px 20px 40px 20px;
+          border-radius: 25px;
+          border: 3px solid transparent;
+          border-image-slice: 1;
+          border-image-source: linear-gradient(45deg, #4facfe, #6b46c1);
           width: 100%;
           max-width: 400px;
-          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          transition: border 0.3s ease, box-shadow 0.3s ease;
         }
+
+        .register-form:hover {
+          border-image-source: linear-gradient(45deg, #4facfe, #553c9a);
+          box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        }
+
+        .back-icon {
+          position: absolute;
+          top: 15px;
+          left: 15px;
+          cursor: pointer;
+          font-size: 20px;
+          color: #6b46c1;
+          font-weight: bold;
+          transition: transform 0.2s ease;
+        }
+
+        .back-icon:hover {
+          transform: translateX(-3px);
+        }
+
         .register-form h2 {
-          margin-bottom: 20px;
-          font-size: 28px;
+          text-align: center;
+          font-size: 26px;
           color: #333;
+          margin-bottom: 20px;
         }
+
         .register-form input[type="text"],
         .register-form input[type="email"],
         .register-form input[type="password"] {
@@ -69,105 +93,134 @@ export default function Register() {
           padding: 12px;
           margin-bottom: 15px;
           border: 1px solid #ccc;
-          border-radius: 10px;
+          border-radius: 12px;
           font-size: 16px;
         }
-        .register-form .role-label {
+
+        .role-group {
+          margin-bottom: 15px;
+          text-align: left;
+        }
+
+        .role-label {
           margin-right: 15px;
           font-size: 16px;
         }
+
         .register-form button {
           width: 100%;
           padding: 12px;
-          background-color: #6b46c1; /* purple */
+          background-color: #6b46c1;
           color: white;
           font-weight: bold;
           border: none;
-          border-radius: 10px;
+          border-radius: 12px;
           cursor: pointer;
           font-size: 16px;
+          transition: background-color 0.3s ease;
         }
+
         .register-form button:hover {
           background-color: #553c9a;
         }
+
         .error-message {
           color: red;
           margin-bottom: 15px;
+          font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+          .register-form {
+            padding: 25px 15px 30px 15px;
+          }
+          .register-form h2 { font-size: 22px; }
+          .register-form input[type="text"],
+          .register-form input[type="email"],
+          .register-form input[type="password"] {
+            padding: 10px;
+            font-size: 15px;
+          }
+          .register-form button { padding: 10px; font-size: 15px; }
+          .back-icon { font-size: 18px; }
         }
       `}</style>
 
-      <div className="container">
-        <form className="register-form" onSubmit={handleSubmit}>
-          <h2>Register</h2>
+      <form className="register-form" onSubmit={handleSubmit}>
+        {/* Back Arrow */}
+        <div className="back-icon" onClick={() => navigate(-1)}>
+          ←
+        </div>
 
-          {error && <div className="error-message">{error}</div>}
+        <h2>Register</h2>
 
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+        {error && <div className="error-message">{error}</div>}
 
-          <input
-            type="text"
-            placeholder="Surname"
-            value={surname}
-            onChange={(e) => setSurname(e.target.value)}
-            required
-          />
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
 
-          <div className="mb-3" style={{ marginBottom: "15px", textAlign: "left" }}>
-            <p style={{ marginBottom: "5px", fontWeight: "bold" }}>Role</p>
-            <label className="role-label">
-              <input
-                type="radio"
-                name="role"
-                value="admin"
-                onChange={(e) => setRole(e.target.value)}
-                required
-              /> Admin
-            </label>
-            <label className="role-label">
-              <input
-                type="radio"
-                name="role"
-                value="customer"
-                onChange={(e) => setRole(e.target.value)}
-                required
-              /> Customer
-            </label>
-            <label className="role-label">
-              <input
-                type="radio"
-                name="role"
-                value="vendor"
-                onChange={(e) => setRole(e.target.value)}
-                required
-              /> Street Vendor
-            </label>
-          </div>
+        <input
+          type="text"
+          placeholder="Surname"
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
+          required
+        />
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+        <div className="role-group">
+          <p style={{ marginBottom: "5px", fontWeight: "bold" }}>Role</p>
+          <label className="role-label">
+            <input
+              type="radio"
+              name="role"
+              value="admin"
+              onChange={(e) => setRole(e.target.value)}
+              required
+            /> Admin
+          </label>
+          <label className="role-label">
+            <input
+              type="radio"
+              name="role"
+              value="customer"
+              onChange={(e) => setRole(e.target.value)}
+              required
+            /> Customer
+          </label>
+          <label className="role-label">
+            <input
+              type="radio"
+              name="role"
+              value="vendor"
+              onChange={(e) => setRole(e.target.value)}
+              required
+            /> Street Vendor
+          </label>
+        </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-          <button type="submit">Register</button>
-        </form>
-      </div>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button type="submit">Register</button>
+      </form>
     </div>
   );
 }

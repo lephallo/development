@@ -49,110 +49,134 @@ function Notification() {
     }
   };
 
-  if (loading) return <p>Loading orders...</p>;
+  if (loading) return <p style={{ padding: "20px", textAlign: "center" }}>Loading orders...</p>;
 
   return (
-    <div>
+    <div className="notification-page">
       {/* Top Navbar */}
-      <div style={navbarStyle}>
-        <FaArrowLeft
-          style={backIconStyle}
-          onClick={() => navigate("/vendorDashboard")}
-        />
-        <h1 style={{ color: "white", margin: 0, marginLeft: "10px" }}>
-          Available Orders
-        </h1>
+      <div className="navbar">
+        <FaArrowLeft className="back-icon" onClick={() => navigate("/vendorDashboard")} />
+        <h1>Available Orders</h1>
       </div>
 
-      <div style={{ padding: "20px", marginTop: "20px" }}>
+      <div className="orders-container">
         {orders.length === 0 ? (
           <p>No orders available.</p>
         ) : (
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              marginTop: "10px",
-            }}
-          >
-            <thead>
-              <tr style={{ backgroundColor: "#f2f2f2" }}>
-                <th style={thStyle}>Customer</th>
-                <th style={thStyle}>Product</th>
-                <th style={thStyle}>Quantity</th>
-                <th style={thStyle}>Total Price</th>
-                <th style={thStyle}>Status</th>
-                <th style={thStyle}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr
-                  key={order.order_id}
-                  style={{ borderBottom: "1px solid #ddd" }}
-                >
-                  <td style={tdStyle}>
-                    {order.customer_name} {order.customer_surname}
-                  </td>
-                  <td style={tdStyle}>{order.product_name}</td>
-                  <td style={tdStyle}>{order.quantity}</td>
-                  <td style={tdStyle}>M{order.total_price}</td>
-                  <td style={tdStyle}>
-                    <span
-                      style={{
-                        color:
-                          order.status === "Pending"
-                            ? "orange"
-                            : order.status === "Approved"
-                            ? "green"
-                            : "black",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>
-                    <button
-                      style={approveButtonStyle}
-                      onClick={() => handleApprove(order.order_id)}
-                    >
-                      {order.status === "Approved" ? "✅ Approved" : "Approve"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="orders-table">
+            {/* Header for large screens */}
+            <div className="table-header">
+              <span>Customer</span>
+              <span>Product</span>
+              <span>Quantity</span>
+              <span>Total Price</span>
+              <span>Status</span>
+              <span>Action</span>
+            </div>
+
+            {orders.map((order) => (
+              <div key={order.order_id} className="table-row">
+                <span>{order.customer_name} {order.customer_surname}</span>
+                <span>{order.product_name}</span>
+                <span>{order.quantity}</span>
+                <span>M{order.total_price}</span>
+                <span className={`status ${order.status.toLowerCase()}`}>{order.status}</span>
+                <span>
+                  <button
+                    className="approve-btn"
+                    onClick={() => handleApprove(order.order_id)}
+                    disabled={order.status === "Approved"}
+                  >
+                    {order.status === "Approved" ? "✅ Approved" : "Approve"}
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
+
+      {/* ----------------- Styles ----------------- */}
+      <style>{`
+        .navbar {
+          background-color: #6A0DAD;
+          padding: 15px 20px;
+          display: flex;
+          align-items: center;
+        }
+        .back-icon {
+          color: white;
+          font-size: 24px;
+          cursor: pointer;
+          margin-right: 10px;
+        }
+        .navbar h1 {
+          color: white;
+          font-size: 20px;
+          flex: 1;
+          margin: 0;
+        }
+        .orders-container {
+          padding: 20px;
+        }
+        .orders-table {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          border-top: 2px solid #ddd;
+        }
+        .table-header, .table-row {
+          display: contents;
+        }
+        .table-header span {
+          font-weight: bold;
+          padding: 10px;
+          border-bottom: 2px solid #ddd;
+        }
+        .table-row span {
+          padding: 10px;
+          border-bottom: 1px solid #ddd;
+        }
+        .status.pending { color: orange; font-weight: bold; }
+        .status.approved { color: green; font-weight: bold; }
+        .approve-btn {
+          padding: 6px 12px;
+          background-color: #28a745;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        .approve-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+          .orders-table {
+            display: flex;
+            flex-direction: column;
+          }
+          .table-header { display: none; }
+          .table-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+          }
+          .table-row span {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border: none;
+          }
+          .table-row span:first-child { font-weight: bold; }
+        }
+      `}</style>
     </div>
   );
 }
-
-// ------------------- Styles -------------------
-const navbarStyle = {
-  backgroundColor: "#6A0DAD", // Purple
-  padding: "15px 30px",
-  display: "flex",
-  alignItems: "center",
-};
-
-const backIconStyle = {
-  color: "white",
-  fontSize: "24px",
-  cursor: "pointer",
-};
-
-const thStyle = { padding: "10px", textAlign: "left", border: "1px solid #ddd" };
-const tdStyle = { padding: "10px", border: "1px solid #ddd" };
-const approveButtonStyle = {
-  padding: "6px 12px",
-  backgroundColor: "#28a745",
-  color: "#fff",
-  border: "none",
-  borderRadius: "5px",
-  cursor: "pointer",
-};
 
 export default Notification;

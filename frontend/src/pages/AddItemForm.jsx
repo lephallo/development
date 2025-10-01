@@ -34,13 +34,14 @@ function AddItemForm() {
           setFormData({ ...formData, location: address });
         } catch (err) {
           console.error(err);
-          alert("Unable to get address from location");
+          alert("Unable to get address from location. Please type it manually.");
         }
       },
       (error) => {
         console.error(error);
-        alert("Unable to retrieve location");
-      }
+        alert("Unable to retrieve location. Please type it manually.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   };
 
@@ -136,9 +137,6 @@ function AddItemForm() {
           font-size: 16px;
           box-sizing: border-box;
         }
-        .item-form input[readonly] {
-          background-color: #e9e9e9;
-        }
         .item-form button {
           width: 100%;
           padding: 12px;
@@ -224,7 +222,13 @@ function AddItemForm() {
           />
 
           <label>Location:</label>
-          <input type="text" name="location" value={formData.location} readOnly placeholder="Click 'Use My Location'" />
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}   // ✅ now user can type
+            placeholder="Click 'Use My Location' or type manually"
+          />
           <button type="button" className="location-button" onClick={getLocation}>
             Use My Location
           </button>
